@@ -1,236 +1,96 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { useState } from 'react';
 
 export default function Home() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [name, setName] = useState('');
-  const [angle, setAngle] = useState(25);
-  const [depth, setDepth] = useState(8);
-  const [branches, setBranches] = useState(2);
-  const [length, setLength] = useState(100);
-
-  // Fractal tree drawing function
-  const drawTree = (ctx: CanvasRenderingContext2D, x: number, y: number, len: number, currentAngle: number, depth: number) => {
-    if (depth === 0) return;
-
-    // Calculate end point of current branch
-    const endX = x + Math.cos(currentAngle * Math.PI / 180) * len;
-    const endY = y + Math.sin(currentAngle * Math.PI / 180) * len;
-
-    // Set line style based on depth for visual variety
-    ctx.strokeStyle = depth > 4 ? '#8B4513' : '#228B22';
-    ctx.lineWidth = depth * 0.5;
-    
-    // Draw the branch
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(endX, endY);
-    ctx.stroke();
-
-    // Calculate uniform branch distribution
-    const totalSpread = angle; // The angle parameter controls total spread
-    const angleStep = branches > 1 ? totalSpread / (branches - 1) : 0;
-    const startAngle = currentAngle - totalSpread / 2;
-
-    // Recursively draw sub-branches with uniform distribution
-    for (let i = 0; i < branches; i++) {
-      const branchAngle = startAngle + (i * angleStep);
-      drawTree(ctx, endX, endY, len * 0.7, branchAngle, depth - 1);
-    }
-  };
-
-  const redrawTree = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Set background
-    ctx.fillStyle = '#f0f8ff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Draw the tree starting from bottom center
-    const startX = canvas.width / 2;
-    const startY = canvas.height - 50;
-    
-    drawTree(ctx, startX, startY, length, -90, depth);
-
-    // Draw the name
-    if (name.trim()) {
-      ctx.font = 'bold 28px Arial';
-      ctx.textAlign = 'center';
-      
-      // Add text shadow for better contrast
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText(`${name}'s Fractal Tree`, canvas.width / 2 + 2, 42);
-      
-      // Main text in dark color for contrast
-      ctx.fillStyle = '#1f2937';
-      ctx.fillText(`${name}'s Fractal Tree`, canvas.width / 2, 40);
-    }
-
-    // Add educational text
-    ctx.font = '14px Arial';
-    ctx.fillStyle = '#4b5563';
-    ctx.textAlign = 'left';
-    ctx.fillText('Notice how the pattern repeats at each level!', 10, canvas.height - 10);
-  };
-
-  useEffect(() => {
-    redrawTree();
-  }, [name, angle, depth, branches, length]);
-
-  const handlePrint = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    // Create a new window for printing
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
-
-    const dataUrl = canvas.toDataURL();
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>${name ? name + "'s " : ''}Fractal Tree</title>
-          <style>
-            body { margin: 0; padding: 20px; text-align: center; }
-            img { max-width: 100%; height: auto; }
-          </style>
-        </head>
-        <body>
-          <img src="${dataUrl}" alt="Fractal Tree" />
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 p-4">
-      <div className="max-w-6xl mx-auto">
-        <header className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-blue-900 mb-2">🌳 Fractal Tree Generator 🌳</h1>
-          <p className="text-lg text-gray-700">Discover patterns in nature! Create your own fractal tree by adjusting the controls below.</p>
-        </header>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Controls Panel */}
-          <div className="lg:col-span-1 bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-2xl font-semibold text-blue-800 mb-6">🎨 Tree Controls</h2>
-            
-            <div className="space-y-6">
-              {/* Name Input */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Your Name
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter your name here!"
-                  className="w-full px-4 py-2 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg text-gray-900 placeholder-gray-500 bg-white"
-                />
-              </div>
-
-              {/* Branch Angle */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Branch Angle: {angle}°
-                </label>
-                <input
-                  type="range"
-                  min="10"
-                  max="90"
-                  value={angle}
-                  onChange={(e) => setAngle(Number(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                />
-                <p className="text-xs text-gray-500 mt-1">How wide the branches spread</p>
-              </div>
-
-              {/* Depth */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Tree Depth: {depth} levels
-                </label>
-                <input
-                  type="range"
-                  min="3"
-                  max="16"
-                  value={depth}
-                  onChange={(e) => setDepth(Number(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                />
-                <p className="text-xs text-gray-500 mt-1">How many levels deep the pattern repeats</p>
-              </div>
-
-              {/* Number of Branches */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Branches per Node: {branches}
-                </label>
-                <input
-                  type="range"
-                  min="2"
-                  max="4"
-                  value={branches}
-                  onChange={(e) => setBranches(Number(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                />
-                <p className="text-xs text-gray-500 mt-1">How many branches grow from each point</p>
-              </div>
-
-              {/* Branch Length */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Initial Branch Length: {length}px
-                </label>
-                <input
-                  type="range"
-                  min="50"
-                  max="150"
-                  value={length}
-                  onChange={(e) => setLength(Number(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                />
-                <p className="text-xs text-gray-500 mt-1">Length of the main trunk</p>
-              </div>
-
-              {/* Print Button */}
-              <button
-                onClick={handlePrint}
-                className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
-              >
-                🖨️ Print My Tree
-              </button>
-            </div>
-
-            {/* Educational Info */}
-            <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-              <h3 className="font-semibold text-blue-800 mb-2">🔬 Did You Know?</h3>
-              <p className="text-sm text-blue-700">
-                Fractals are patterns that repeat at every scale! Trees, ferns, and many other things in nature follow fractal patterns. 
-                Notice how each branch looks like a smaller version of the whole tree!
-              </p>
-            </div>
-          </div>
-
-          {/* Canvas */}
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6">
-            <canvas
-              ref={canvasRef}
-              width={800}
-              height={600}
-              className="border border-gray-200 rounded-lg w-full h-auto"
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">
+            Nature's Fractal Patterns
+          </h1>
+          <p className="text-xl text-gray-600 mb-8">
+            Explore the beautiful mathematical patterns found in nature
+          </p>
+          
+          {/* Name Input */}
+          <div className="mb-8">
+            <label className="block text-lg font-medium text-gray-700 mb-2">
+              Enter Your Name:
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your name here..."
+              className="px-4 py-2 border border-gray-300 rounded-lg text-center text-lg w-80 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
+          </div>
+        </div>
+
+        {/* Pattern Selection */}
+        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+          {/* Tree Pattern Card */}
+          <Link 
+            href={`/tree?name=${encodeURIComponent(name)}`}
+            className="group"
+          >
+            <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300 border-2 border-transparent hover:border-green-200">
+              <div className="text-center">
+                <div className="text-6xl mb-4">🌳</div>
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                  Fractal Trees
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  Explore the branching patterns found in trees, rivers, and lightning. 
+                  Watch how simple rules create complex, natural-looking structures.
+                </p>
+                <div className="bg-green-100 text-green-800 px-4 py-2 rounded-lg font-medium group-hover:bg-green-200 transition-colors">
+                  Create Tree Pattern →
+                </div>
+              </div>
+            </div>
+          </Link>
+
+          {/* Snowflake Pattern Card */}
+          <Link 
+            href={`/snowflake?name=${encodeURIComponent(name)}`}
+            className="group"
+          >
+            <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300 border-2 border-transparent hover:border-blue-200">
+              <div className="text-center">
+                <div className="text-6xl mb-4">❄️</div>
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                  Snowflake Fractals
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  Discover the six-fold symmetry and infinite variety of snowflakes. 
+                  No two snowflakes are alike, yet they all follow the same mathematical rules.
+                </p>
+                <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg font-medium group-hover:bg-blue-200 transition-colors">
+                  Create Snowflake Pattern →
+                </div>
+              </div>
+            </div>
+          </Link>
+        </div>
+
+        {/* Educational Info */}
+        <div className="mt-16 text-center">
+          <div className="bg-white rounded-xl shadow-md p-8 max-w-2xl mx-auto">
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">
+              What are Fractals?
+            </h3>
+            <p className="text-gray-600 text-lg leading-relaxed">
+              Fractals are patterns that repeat at every scale. They're everywhere in nature - 
+              from the branching of trees to the structure of snowflakes, from coastlines to clouds. 
+              These patterns follow simple mathematical rules that create incredibly complex and beautiful results.
+            </p>
           </div>
         </div>
       </div>
