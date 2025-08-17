@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function NautilusPage() {
+function NautilusPageContent() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const searchParams = useSearchParams();
   const [name, setName] = useState(searchParams.get('name') || '');
@@ -293,5 +293,18 @@ export default function NautilusPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function NautilusPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 mx-auto"></div>
+        <p className="mt-4 text-purple-600">Loading your nautilus spiral...</p>
+      </div>
+    </div>}>
+      <NautilusPageContent />
+    </Suspense>
   );
 }

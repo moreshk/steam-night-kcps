@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function FlowerPage() {
+function FlowerPageContent() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const searchParams = useSearchParams();
   const [name, setName] = useState(searchParams.get('name') || '');
@@ -296,5 +296,18 @@ export default function FlowerPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function FlowerPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-yellow-50 to-green-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-yellow-600 mx-auto"></div>
+        <p className="mt-4 text-yellow-600">Loading your sunflower...</p>
+      </div>
+    </div>}>
+      <FlowerPageContent />
+    </Suspense>
   );
 }

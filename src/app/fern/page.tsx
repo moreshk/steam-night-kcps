@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function FernPage() {
+function FernPageContent() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const searchParams = useSearchParams();
   const [name, setName] = useState(searchParams.get('name') || '');
@@ -306,5 +306,18 @@ export default function FernPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function FernPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600 mx-auto"></div>
+        <p className="mt-4 text-green-600">Loading your fern fractal...</p>
+      </div>
+    </div>}>
+      <FernPageContent />
+    </Suspense>
   );
 }

@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function TreePage() {
+function TreePageContent() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const searchParams = useSearchParams();
   const [name, setName] = useState(searchParams.get('name') || '');
@@ -43,7 +43,7 @@ export default function TreePage() {
     }
   };
 
-  const redrawTree = () => {
+  const redrawTree = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -78,11 +78,11 @@ export default function TreePage() {
     ctx.fillStyle = '#4b5563';
     ctx.textAlign = 'left';
     ctx.fillText('Notice how the pattern repeats at each level!', 10, canvas.height - 10);
-  };
+  }, [name, angle, depth, branches, length, drawTree]);
 
   useEffect(() => {
     redrawTree();
-  }, [name, angle, depth, branches, length]);
+  }, [name, angle, depth, branches, length, redrawTree]);
 
   const handlePrint = () => {
     const canvas = canvasRef.current;
@@ -245,5 +245,18 @@ export default function TreePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function TreePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="mt-4 text-blue-600">Loading your fractal tree...</p>
+      </div>
+    </div>}>
+      <TreePageContent />
+    </Suspense>
   );
 }
