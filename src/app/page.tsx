@@ -12,7 +12,7 @@ export default function Home() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-800 mb-4">
-            Nature's Fractal Patterns
+            Nature&apos;s Fractal Patterns
           </h1>
           <p className="text-xl text-gray-600 mb-8">
             Explore the beautiful mathematical patterns found in nature
@@ -34,7 +34,7 @@ export default function Home() {
         </div>
 
         {/* Pattern Selection */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {/* Tree Pattern Card */}
           <Link 
             href={`/tree?name=${encodeURIComponent(name)}`}
@@ -78,6 +78,28 @@ export default function Home() {
               </div>
             </div>
           </Link>
+
+          {/* Nautilus Pattern Card */}
+          <Link 
+            href={`/nautilus?name=${encodeURIComponent(name)}`}
+            className="group"
+          >
+            <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300 border-2 border-transparent hover:border-blue-200">
+              <div className="text-center">
+                <div className="text-6xl mb-4">🐚</div>
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                  Nautilus Shell Spirals
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  Explore the perfect logarithmic spirals found in nautilus shells. 
+                  These spirals follow the golden ratio, creating nature&apos;s most elegant curves.
+                </p>
+                <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg font-medium group-hover:bg-blue-200 transition-colors">
+                  Create Spiral Pattern →
+                </div>
+              </div>
+            </div>
+          </Link>
         </div>
 
         {/* Educational Info */}
@@ -87,7 +109,7 @@ export default function Home() {
               What are Fractals?
             </h3>
             <p className="text-gray-600 text-lg leading-relaxed">
-              Fractals are patterns that repeat at every scale. They're everywhere in nature - 
+              Fractals are patterns that repeat at every scale. They&apos;re everywhere in nature - 
               from the branching of trees to the structure of snowflakes, from coastlines to clouds. 
               These patterns follow simple mathematical rules that create incredibly complex and beautiful results.
             </p>
