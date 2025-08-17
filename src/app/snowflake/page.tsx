@@ -82,13 +82,6 @@ export default function SnowflakePage() {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Set background
-    const gradient = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2);
-    gradient.addColorStop(0, '#f0f8ff');
-    gradient.addColorStop(1, '#e6f3ff');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
 
@@ -168,26 +161,35 @@ export default function SnowflakePage() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
+    // Ensure canvas is fully rendered before printing
+    setTimeout(() => {
+      const dataUrl = canvas.toDataURL();
+      
+      // Create a new window for printing
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) return;
 
-    const dataUrl = canvas.toDataURL();
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>${name ? name + "'s " : ''}Snowflake</title>
-          <style>
-            body { margin: 0; padding: 20px; text-align: center; }
-            img { max-width: 100%; height: auto; }
-          </style>
-        </head>
-        <body>
-          <img src="${dataUrl}" alt="Fractal Snowflake" />
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>${name ? name + "'s " : ''}Snowflake</title>
+            <style>
+              body { margin: 0; padding: 20px; text-align: center; }
+              img { max-width: 100%; height: auto; }
+            </style>
+          </head>
+          <body>
+            <img src="${dataUrl}" alt="Fractal Snowflake" />
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      
+      // Small delay before printing to ensure content is loaded
+      setTimeout(() => {
+        printWindow.print();
+      }, 100);
+    }, 100);
   };
 
   return (

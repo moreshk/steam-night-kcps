@@ -53,10 +53,6 @@ export default function TreePage() {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Set background
-    ctx.fillStyle = '#f0f8ff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
     // Draw the tree starting from bottom center
     const startX = canvas.width / 2;
     const startY = canvas.height - 50;
@@ -92,27 +88,35 @@ export default function TreePage() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Create a new window for printing
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
+    // Ensure canvas is fully rendered before printing
+    setTimeout(() => {
+      const dataUrl = canvas.toDataURL();
+      
+      // Create a new window for printing
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) return;
 
-    const dataUrl = canvas.toDataURL();
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>${name ? name + "'s " : ''}Fractal Tree</title>
-          <style>
-            body { margin: 0; padding: 20px; text-align: center; }
-            img { max-width: 100%; height: auto; }
-          </style>
-        </head>
-        <body>
-          <img src="${dataUrl}" alt="Fractal Tree" />
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>${name ? name + "'s " : ''}Fractal Tree</title>
+            <style>
+              body { margin: 0; padding: 20px; text-align: center; }
+              img { max-width: 100%; height: auto; }
+            </style>
+          </head>
+          <body>
+            <img src="${dataUrl}" alt="Fractal Tree" />
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      
+      // Small delay before printing to ensure content is loaded
+      setTimeout(() => {
+        printWindow.print();
+      }, 100);
+    }, 100);
   };
 
   return (
